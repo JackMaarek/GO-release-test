@@ -1,4 +1,4 @@
-module github.com/JackMaarek/sbTest
+module github.com/JackMaarek/GO-release-test
 
 go 1.15
 
