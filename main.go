@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/JackMaarek/sbTest/database"
-	"github.com/JackMaarek/sbTest/mailer"
-	"github.com/JackMaarek/sbTest/shared"
-	"github.com/JackMaarek/sbTest/shared/repositories"
+	"github.com/JackMaarek/Go-release-test/database"
+	"github.com/JackMaarek/Go-release-test/mailer"
+	"github.com/JackMaarek/Go-release-test/shared"
+	"github.com/JackMaarek/Go-release-test/shared/repositories"
 )
 
 func main() {

@@ -2,8 +2,8 @@ package shared
 
 import (
 	"fmt"
-	"github.com/JackMaarek/sbTest/mailer"
-	"github.com/JackMaarek/sbTest/shared/repositories"
+	"github.com/JackMaarek/Go-release-test/mailer"
+	"github.com/JackMaarek/Go-release-test/shared/repositories"
 	"log"
 )
 
