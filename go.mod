@@ -1,4 +1,4 @@
-module github.com/JackMaarek/GO-release-test
+module github.com/JackMaarek/Go-release-test
 
 go 1.15
 
