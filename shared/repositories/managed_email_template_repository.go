@@ -15,7 +15,7 @@ type ManagedEmailTemplate struct {
 }
 
 // FindTemplateByInternalID returns a pointer of ManagedEmailTemplate for the given internal id.
-func (repo *ManagedEmailTemplateRepository) FindTemplateByInternalID(internalID string) (*ManagedEmailTemplate, error) {
+func (repo *Repository) FindTemplateByInternalID(internalID string) (*ManagedEmailTemplate, error) {
 	var managedTemplate ManagedEmailTemplate
 	row := repo.DB.QueryRow(`
 SELECT

@@ -8,19 +8,14 @@ import (
 	"net/http"
 )
 
-// SBConnector handles the email sending to SendinBlue API.
-type SBConnector struct {
-	SBDetails *SBDetails
-}
-
 // Send transmits the email message to SendInBlue
-func (sbc *SBConnector) Send(m *Message) error {
+func (sbd *SBDetails) Send(m *Message) error {
 	data, err := json.Marshal(m)
 	if err != nil {
 		return errors.New("failed to encode message: " + err.Error())
 	}
-	req, _ := http.NewRequest("POST", sbc.SBDetails.Url, bytes.NewReader(data))
-	req.Header.Add("api-key", sbc.SBDetails.ApiKey)
+	req, _ := http.NewRequest("POST", sbd.Url, bytes.NewReader(data))
+	req.Header.Add("api-key", sbd.ApiKey)
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := http.DefaultClient.Do(req)
@@ -36,11 +31,11 @@ func (sbc *SBConnector) Send(m *Message) error {
 }
 
 // CreateEmailMessage create the prerequisite for the email message.
-func (sbc *SBConnector) CreateEmailMessage(addressList []*Address, templateId int64, params map[string]string) *Message {
+func (sbd *SBDetails) CreateEmailMessage(addressList []*Address, templateId int64, params map[string]string) *Message {
 	message := Message{
 		Sender: &Address{
-			Name:  sbc.SBDetails.SenderName,
-			Email: sbc.SBDetails.SenderEmail,
+			Name:  sbd.SenderName,
+			Email: sbd.SenderEmail,
 		},
 		To:         addressList,
 		Headers:    nil,

@@ -23,7 +23,7 @@ type UserRole struct {
 }
 
 // FindRoleByUserID returns the UserRole of the given user id (gathered from phishing campaign initiator.)
-func (repo *RoleRepository) FindRolesByUserUUID(userUUID string) ([]*UserRole, error) {
+func (repo *Repository) FindRolesByUserUUID(userUUID string) ([]*UserRole, error) {
 	var roleId int64
 	var roleName string
 	var userRoleList []*UserRole
@@ -62,7 +62,7 @@ WHERE
 }
 
 // CheckCompanyManagerRole takes the user role list and return a boolean depending on the roleName argument.
-func (repo *RoleRepository) CheckCompanyManagerRole(roleList []*UserRole, roleName string) bool {
+func (repo *Repository) CheckCompanyManagerRole(roleList []*UserRole, roleName string) bool {
 	var userRole *UserRole
 	for _, userRole = range roleList {
 		if userRole.Name == roleName {

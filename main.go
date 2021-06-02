@@ -28,15 +28,12 @@ func main() {
 		SenderName:  "riskandme",
 	}
 
-	connector := mailer.SBConnector{SBDetails: SBDetails}
-	urepo := repositories.UserRepository{DB: db}
-	rrepo := repositories.RoleRepository{DB: db}
-	mtrepo := repositories.ManagedEmailTemplateRepository{DB: db}
+	repo := repositories.Repository{DB: db}
+
 	mailerService := shared.MailerService{
-		SBConnector:    connector,
-		RoleRepository: &rrepo,
-		UserRepository: &urepo,
-		ManagedEmailTemplateRepository: &mtrepo,
+		SBDetails:      SBDetails,
+		Repository: 	&repo,
+
 	}
 
 	err = mailerService.SendCompletedCampaignMail("e5651054-f54a-48ff-b25c-8235129d9e0d", "6a9e607a-cfb7-4ba1-a111-41129a125821")

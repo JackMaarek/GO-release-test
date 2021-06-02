@@ -14,20 +14,18 @@ const (
 
 // MailerService handles email operations on phishing.
 type MailerService struct {
-	SBConnector    mailer.SBConnector
-	RoleRepository *repositories.RoleRepository
-	UserRepository *repositories.UserRepository
-	ManagedEmailTemplateRepository *repositories.ManagedEmailTemplateRepository
+	SBDetails      *mailer.SBDetails
+	Repository 	   *repositories.Repository
 }
 
 // SendCompletedCampaignMail send a different email depending on campaign initiator role.
 func (ms *MailerService) SendCompletedCampaignMail(companyUUID string, initiatorUUID string) error {
-	userRoleList, err := ms.RoleRepository.FindRolesByUserUUID(initiatorUUID)
+	userRoleList, err := ms.Repository.FindRolesByUserUUID(initiatorUUID)
 	if err != nil {
 		log.Printf("failed fetching campaign initiator role list from DB with user UUId id %s, reason: %s\n", initiatorUUID, err.Error())
 		return fmt.Errorf("failed fetching campaign initiator role list from DB with user UUId id %s, reason: %s\n", initiatorUUID, err.Error())
 	}
-	isManager := ms.RoleRepository.CheckCompanyManagerRole(userRoleList, repositories.ROLE_COMPANY_MANAGER)
+	isManager := ms.Repository.CheckCompanyManagerRole(userRoleList, repositories.ROLE_COMPANY_MANAGER)
 	if isManager {
 		err := ms.sendMailToCompanyManager(companyUUID)
 		if err != nil {
@@ -49,12 +47,12 @@ func (ms *MailerService) sendMailToCompanyManager(companyUUID string) error {
 	var user *repositories.User
 	var addressList []*mailer.Address
 	var sendErrorCount int
-	userList, err := ms.UserRepository.FindUsersByCompanyUUIDAndRoleName(companyUUID, repositories.ROLE_COMPANY_MANAGER)
+	userList, err := ms.Repository.FindUsersByCompanyUUIDAndRoleName(companyUUID, repositories.ROLE_COMPANY_MANAGER)
 	if err != nil {
 		log.Printf("failed fetching user list from DB with company UUId id %s, reason: %s\n", companyUUID, err.Error())
 		return fmt.Errorf("failed fetching user list from DB with company UUId id %s, reason: %s\n", companyUUID, err.Error())
 	}
-	mt, err := ms.ManagedEmailTemplateRepository.FindTemplateByInternalID(PHISHING_CAMPAIGN_FINISHED_MANAGER_NOTIFICATION_TEMPLATE_ID)
+	mt, err := ms.Repository.FindTemplateByInternalID(PHISHING_CAMPAIGN_FINISHED_MANAGER_NOTIFICATION_TEMPLATE_ID)
 	if err != nil {
 		log.Printf("failed fetching ManagedEmailTemplate object from DB with internal id %s, reason: %s\n",
 			PHISHING_CAMPAIGN_FINISHED_MANAGER_NOTIFICATION_TEMPLATE_ID,
@@ -75,7 +73,7 @@ func (ms *MailerService) sendMailToCompanyManager(companyUUID string) error {
 		if err != nil {
 
 		}
-		err = ms.SBConnector.Send(ms.createMessage(addressList, mt.ProviderID))
+		err = ms.SBDetails.Send(ms.createMessage(addressList, mt.ProviderID))
 		addressList = []*mailer.Address{}
 		if err != nil {
 			sendErrorCount++
@@ -91,7 +89,7 @@ func (ms *MailerService) sendMailToCompanyManager(companyUUID string) error {
 // sendMailToInitiator takes the initiatorUUID to gather its information and create the Address for the email message.
 func (ms *MailerService) sendMailToInitiator(initiatorUUID string) error {
 	var addressList []*mailer.Address
-	user, err := ms.UserRepository.FindInitiatorInformationByUserUUID(initiatorUUID)
+	user, err := ms.Repository.FindInitiatorInformationByUserUUID(initiatorUUID)
 	if err != nil {
 		log.Printf("failed fetching user information from DB with user UUId id %s, reason: %s\n", initiatorUUID, err.Error())
 		return fmt.Errorf("failed fetching user information from DB with user UUId id %s, reason: %s\n", initiatorUUID, err.Error())
@@ -101,7 +99,7 @@ func (ms *MailerService) sendMailToInitiator(initiatorUUID string) error {
 		Email: user.Email,
 	}
 	addressList = append(addressList, &address)
-	mt, err := ms.ManagedEmailTemplateRepository.FindTemplateByInternalID(PHISHING_CAMPAIGN_FINISHED_EXPERT_NOTIFICATION_TEMPLATE_ID)
+	mt, err := ms.Repository.FindTemplateByInternalID(PHISHING_CAMPAIGN_FINISHED_EXPERT_NOTIFICATION_TEMPLATE_ID)
 	if err != nil {
 		log.Printf("failed fetching ManagedEmailTemplate object from DB with internal id %s, reason: %s\n",
 			PHISHING_CAMPAIGN_FINISHED_EXPERT_NOTIFICATION_TEMPLATE_ID,
@@ -113,7 +111,7 @@ func (ms *MailerService) sendMailToInitiator(initiatorUUID string) error {
 		)
 	}
 
-	err = ms.SBConnector.Send(ms.createMessage(addressList, mt.ProviderID))
+	err = ms.SBDetails.Send(ms.createMessage(addressList, mt.ProviderID))
 	if err != nil {
 		log.Printf("failed sending email to user with UUId id %s, reason: %s\n", initiatorUUID, err.Error())
 		return fmt.Errorf("failed sending email to user with UUId id %s, reason: %s\n", initiatorUUID, err.Error())
@@ -125,7 +123,7 @@ func (ms *MailerService) sendMailToInitiator(initiatorUUID string) error {
 func (ms *MailerService) createMessage(addressList []*mailer.Address, templateId int64) *mailer.Message {
 	params := make(map[string]string)
 	params["URL"] = "https://app.riskandme.com"
-	message := ms.SBConnector.CreateEmailMessage(addressList, templateId, params)
+	message := ms.SBDetails.CreateEmailMessage(addressList, templateId, params)
 
 	return message
 }

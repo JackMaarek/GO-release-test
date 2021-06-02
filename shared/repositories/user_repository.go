@@ -18,7 +18,7 @@ type User struct {
 }
 
 // FindUsersByCompanyUUIDAndRoleName returns a slice of User informations by the pretty self explanatory conditions.
-func (repo *UserRepository) FindUsersByCompanyUUIDAndRoleName(companyUUID string, roleName string) ([]*User, error) {
+func (repo *Repository) FindUsersByCompanyUUIDAndRoleName(companyUUID string, roleName string) ([]*User, error) {
 	var userFirstname, userLastname, userEmail string
 	var users []*User
 
@@ -60,7 +60,7 @@ WHERE
 }
 
 // FindInitiatorInformationByUserUUID returns the initiator User informations.
-func (repo *UserRepository) FindInitiatorInformationByUserUUID(userUUID string) (*User, error) {
+func (repo *Repository) FindInitiatorInformationByUserUUID(userUUID string) (*User, error) {
 	var userFirstname, userLastname, userEmail string
 	row := repo.DB.QueryRow(`
 SELECT 
